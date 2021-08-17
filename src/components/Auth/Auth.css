@@ -1,0 +1,9 @@
+.submitButton:enabled{
+    background-color: rgb(255, 0, 0);
+    color:white
+}
+
+.submitButton:disabled{
+    background-color: rgb(190, 190, 190);
+    color:grey
+}
