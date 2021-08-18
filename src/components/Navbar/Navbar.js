@@ -8,6 +8,7 @@ import axios from "axios"
 import { AuthContext } from '../../context/AuthContext'
 import CheckAuthCookie from '../hooks/checkAuthCookie'
 
+
 const useStyles = makeStyles((theme)=>({
     root:{
         flexGrow: 1,
@@ -64,7 +65,14 @@ function Navbar(props) {
                     <Link to="/" style={{fontSize:"40px", fontWeight:"bold", color:"white", textDecoration:"none"}}>YELP</Link>
                 </Typography>
 
-        
+                {isUserLoggedIn && 
+                (<NavLink activeStyle={{color:"white"}} exact to="/saved">
+                    <Button color="inherit" style={{color:"white"}}>
+                        Saved
+                    </Button>
+                </NavLink>)
+                }
+
                 <NavLink activeStyle={{color:"white"}} exact to={navLinkTitleOne}>
                     <Button color="inherit" style={{color:"white"}}>
                         {navLinkDisplayOne}

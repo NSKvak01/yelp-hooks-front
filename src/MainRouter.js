@@ -8,6 +8,7 @@ const Auth = React.lazy(()=>import ('./components/Auth/Auth'))
 const NotFound = React.lazy(()=> import ('./components/NotFound/NotFound'))
 const Protected = React.lazy(()=>import ("./components/Protected/Protected"))
 const Profile = React.lazy(()=>import ("./components/Profile/Profile"))
+const Saved = React.lazy(()=>import ("./components/Saved/Saved"))
 
 function MainRouter() {
     return (
@@ -21,6 +22,7 @@ function MainRouter() {
                 <Route exact path="/" component = {Home} />
                 <PrivateRoute exact path="/protected" component={Protected} />
                 <PrivateRoute exact path="/profile" component={Profile} />
+                <PrivateRoute exact path="/saved" component={Saved} />
 
                 <Route component={NotFound} />
             </Switch>

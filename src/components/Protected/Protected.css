@@ -1,0 +1,8 @@
+button:disabled{
+    background-color: grey;
+}
+
+button:enabled{
+    background-color:red;
+    border:1px solid red
+}
