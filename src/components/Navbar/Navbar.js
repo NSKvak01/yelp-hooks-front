@@ -66,6 +66,13 @@ function Navbar(props) {
                 </Typography>
 
                 {isUserLoggedIn && 
+                (<NavLink activeStyle={{color:"white"}} exact to="/protected">
+                    <Button color="inherit" style={{color:"white"}}>
+                        Search
+                    </Button>
+                </NavLink>)
+                }
+                {isUserLoggedIn && 
                 (<NavLink activeStyle={{color:"white"}} exact to="/saved">
                     <Button color="inherit" style={{color:"white"}}>
                         Saved

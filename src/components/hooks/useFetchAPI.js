@@ -31,7 +31,7 @@ function useFetchAPI(url){
             setIsLoading(true)
         }
 
-        async function handleAPIFetchCall(){
+        async function handleAPIFetchCall(props){
             const requestOptionObj = {
                 ...options,
                 withCredentials:true,
@@ -62,6 +62,7 @@ function useFetchAPI(url){
                         }
                     })
                 }
+
             } catch (e) {
                 console.log(e)
                 setError(e.response.data.message)

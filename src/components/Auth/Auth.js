@@ -1,10 +1,11 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {makeStyles} from "@material-ui/core/styles"
 import {Grid, 
     Button, 
     TextField, 
     CircularProgress, 
-    Snackbar} from "@material-ui/core"
+    Snackbar,
+    Input} from "@material-ui/core"
 import MuiAlert from "@material-ui/lab/Alert"
 import useChangeInputConfig from '../hooks/useInput'
 import useFetchAPI from '../hooks/useFetchAPI'
@@ -37,13 +38,32 @@ function Auth(props) {
     ,
     successMessageValue] = useFetchAPI(apiURL)
 
-    const [email, handleEmailChange, isEmailError, emailErrorMessage, isEmailDisabled, clearEmailInput] = useChangeInputConfig("email")
-    const [emailUsername, handleEmailUsernameChange, isEmailUsernameError, emailUsernameErrorMessage, isEmailUsernameDisabled, clearEmailUsernameInput] = useChangeInputConfig("email/username")
-    const [password, handlePasswordChange, isPasswordError, passwordErrorMessage, isPasswordDisabled, clearPasswordInput] = useChangeInputConfig("password")
-    const [username, handleUsernameChange, isUsernameError, usernameErrorMessage, isUsernameDisabled, clearUsernameInput] = useChangeInputConfig("username")
-    const [firstName, handleFirstNameChange, isFirstNameError, firstNameErrorMessage, isFirstNameDisabled, clearFirstNameInput] = useChangeInputConfig("firstName")
-    const [lastName, handleLastNameChange, isLastNameError, lastNameErrorMessage, isLastNameDisabled, clearLastNameInput] = useChangeInputConfig("lastName")
-    
+    const [email, handleEmailChange, isEmailError, ,emailErrorMessage, ,isEmailDisabled, clearEmailInput] = useChangeInputConfig("Email")
+    const [emailUsername, handleEmailUsernameChange, isEmailUsernameError, ,emailUsernameErrorMessage, ,isEmailUsernameDisabled, clearEmailUsernameInput] = useChangeInputConfig("Email/Username")
+    const [password, handlePasswordChange, isPasswordError, ,passwordErrorMessage, ,isPasswordDisabled, clearPasswordInput] = useChangeInputConfig("Password")
+    const [username, handleUsernameChange, isUsernameError, ,usernameErrorMessage, ,isUsernameDisabled, clearUsernameInput] = useChangeInputConfig("Username")
+    const [firstName, handleFirstNameChange, isFirstNameError, ,firstNameErrorMessage, ,isFirstNameDisabled, clearFirstNameInput] = useChangeInputConfig("First name")
+    const [lastName, handleLastNameChange, isLastNameError, ,lastNameErrorMessage, ,isLastNameDisabled, clearLastNameInput] = useChangeInputConfig("Last name")
+    const [confirmPassword, handleConfirmPasswordChange, isConfirmPasswordError, setIsConfirmPasswordError, confirmPasswordErrorMessage, setConfirmPasswordErrorMessage,isConfirmPasswordDisabled, clearConfirmPasswordInput] = useChangeInputConfig("Confirm password")
+    const [passwordTouched, setPasswordTouched] = useState(false)
+
+    useEffect(() => {
+        if(passwordTouched){
+            if(password !== confirmPassword){
+                    setIsConfirmPasswordError(true)
+                    setConfirmPasswordErrorMessage(`Passwords don't match`)
+            } else{
+                setIsConfirmPasswordError(false)
+                setConfirmPasswordErrorMessage(``)
+            }
+        }
+       console.log(password, confirmPassword)
+    }, [password, confirmPassword])
+
+    function handleOnFocus(){
+        setPasswordTouched(true)
+    }
+
     async function handleOnSubmit(e){
         e.preventDefault()
         const user = isLoginRoute ? {emailUsername, password}:{firstName, lastName, username, email, password}
@@ -59,7 +79,7 @@ function Auth(props) {
     function successMessage(){
         return(
             <Snackbar open={isMessageOpen} autoHideDuration={6000} onClose={handleMessageClose}
-            style={{transform:"translateY(-500px)"}}>
+           >
                 <Alert severity="success">{successMessageValue}</Alert>
             </Snackbar>
         )
@@ -72,7 +92,7 @@ function Auth(props) {
     function errorMessage(){
         return(
             <Snackbar open={isMessageOpen} autoHideDuration={6000} onClose={handleMessageClose}
-            style = {{transform:"translateY(-500px)"}}>
+            >
                 <Alert severity="error">{error}</Alert>
             </Snackbar>
         )
@@ -86,14 +106,17 @@ function Auth(props) {
         )
     }
 
-    if(response ==="Success - User created"){
+    if(response ==="Success - user created"){
         clearEmailInput()
         clearUsernameInput()
         clearPasswordInput()
+        clearConfirmPasswordInput()
         clearFirstNameInput()
         clearLastNameInput()
         setResponse(null)
+        props.history.push('/login')
     }
+    
     if(response ==="Success login"){
         clearEmailUsernameInput()
         clearPasswordInput()
@@ -158,6 +181,7 @@ function Auth(props) {
                             fullWidth 
                             label="Email" 
                             name="email" 
+                            type="email"
                             value={email} 
                             onChange={handleEmailChange}
                             error = {isEmailError}
@@ -187,8 +211,27 @@ function Auth(props) {
                 value={password} 
                 onChange={handlePasswordChange}
                 error = {isPasswordError}
-                helperText={passwordErrorMessage}/>
+                helperText={passwordErrorMessage}
+                type="password"
+                />
                 </Grid>
+                {
+                    !isLoginRoute && (
+                        <Grid item m={6}>
+                            <TextField 
+                            fullWidth 
+                            label="Confirm password" 
+                            name="confirmPassword" 
+                            type="password"
+                            value={confirmPassword} 
+                            onChange={handleConfirmPasswordChange}
+                            error = {isConfirmPasswordError}
+                            helperText={confirmPasswordErrorMessage}
+                            onFocus={handleOnFocus}
+                            />
+                        </Grid>
+                    )
+                }
                 <Grid style={{textAlign:"center"}}>
                     <Button type="submit" variant="contained" color="primary" className="submitButton"
                     style={{marginTop:10}} disabled={isLoginRoute? isEmailUsernameDisabled || isPasswordDisabled 

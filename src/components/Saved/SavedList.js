@@ -1,46 +1,36 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import axios from "axios"
-import { toast } from 'react-toastify'
 import Cookie from "js-cookie"
 
 
-
-function YelpList(props) {
-    const {item, name, image, phone, location, price, rating, reviewCount, website} = props
+function SavedList(props) {
+    const {_id, name, image, url, location, phone, rating, reviews, price} = props.item
+    const {fetchYelp}=props
     let phoneHref = "tel:"+[phone]
-    let locationHref = "https://maps.google.com/maps?q="+location
+    let locationHref = "https://maps.google.com/maps?q="+location;
+    
 
-    async function addYelp(){
+    async function handleDelete(){
         const cookie = Cookie.get("jwt-cookie")
         try {
-            let newYelp = {
-                name:name,
-                image:image,
-                url:website,
-                phone:phone,
-                rating:rating,
-                price:price,
-                reviews:reviewCount,
-                location:location.join()
-            }
-            let result = await axios.post("http://localhost:3000/api/yelp/add-yelp", newYelp, {
-                headers:{authorization:`Bearer ${cookie}`}
+            let deletedYelp = await axios.delete(`http://localhost:3000/api/yelp/delete-yelp/${_id}`, {
+                headers:{
+                    authorization:`Bearer ${cookie}`
+                }
             })
-            toast.success(`Restaurant saved`);
-            console.log(result)
+            fetchYelp()
         } catch (e) {
-            console.log(e)
+            console.log(e);
         }
     }
 
     return (
-        <React.Fragment>
-            <li style={{display:"flex", justifyContent:"center"}}>
+        <div>
+            <li style={{display:"flex", justifyContent:"center", marginTop:"50px", marginBottom:"20px"}}>
                 <div style={{marginTop:"50px"}}>
                     <img src={image} style={{width:"450px", border:"10px solid red"}} />
                 </div>
                 <div style={{marginLeft:"80px", marginTop:"50px",}}>
-                    <div style={{display:"flex", justifyContent:"flex-end", width:"350px"}}><img src="https://cdn4.vectorstock.com/i/1000x1000/31/33/bookmark-sign-red-bookmark-icon-on-white-vector-20973133.jpg" style={{width:"30px"}} onClick={addYelp}  /></div>
                     <h1>{name}</h1>
                     <h3 style={{marginTop:-10, color:"red", fontSize:"22px", marginBottom:"10px", marginLeft:"5px"}}>{price}</h3>
                     <div style={{display:"flex", justifyContent:"space-between", width:"300px", marginLeft:"5px"}}>
@@ -50,12 +40,12 @@ function YelpList(props) {
                         </div>
                         <div style={{display:"flex", alignItems:"center"}}>
                             <h3 style={{color:"rgb(100, 100, 100)", fontSize:"20px"}}>Reviews: </h3>
-                            <h3 style={{marginLeft:"5px"}}>{reviewCount}</h3>
+                            <h3 style={{marginLeft:"5px"}}>{reviews}</h3>
                         </div>
                     </div>
                     <div style={{display:"flex", alignItems:"center", marginLeft:"5px"}}>
                         <h3 style={{marginRight:"20px", color:"rgb(100, 100, 100)"}}>Website: </h3>
-                        <a href={website} target="_blank" style={{fontSize:"18px", color:"black", fontWeight:"bold", marginLeft:"-15px"}}>Check {name} here</a>
+                        <a href={url} target="_blank" style={{fontSize:"18px", color:"black", fontWeight:"bold", marginLeft:"-15px"}}>Check {name} here</a>
                     </div>
                     <div style={{height:"40px", marginLeft:"5px"}}>
                         <h3 style={{color:"rgb(100, 100, 100)"}} >Phone: <a href={phoneHref} style={{color:"black"}}>{phone}</a></h3>
@@ -63,12 +53,13 @@ function YelpList(props) {
                     <div style={{height:"40px", marginLeft:"5px"}}>
                         <h3 style={{color:"rgb(100, 100, 100)", width:"500px"}}>Address: <a href={locationHref} target="_blank" style={{width:"500px", fontSize:"18px", color:"black", fontWeight:"bold"}}>{location}</a></h3>
                     </div>
-                    
+                    <div style={{display:"flex", width:"400px", justifyContent:"flex-end"}}>
+                        <button onClick={handleDelete} style={{width:"150px", height:"35px", color:"white", fontSize:"18px", marginTop:"20px"}}>Delete</button>
+                    </div>
                 </div>
             </li>
-
-        </React.Fragment>
+        </div>
     )
 }
 
-export default YelpList
+export default SavedList
