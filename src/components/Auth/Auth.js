@@ -41,6 +41,7 @@ function Auth(props) {
     const [email, handleEmailChange, isEmailError, ,emailErrorMessage, ,isEmailDisabled, clearEmailInput] = useChangeInputConfig("Email")
     const [emailUsername, handleEmailUsernameChange, isEmailUsernameError, ,emailUsernameErrorMessage, ,isEmailUsernameDisabled, clearEmailUsernameInput] = useChangeInputConfig("Email/Username")
     const [password, handlePasswordChange, isPasswordError, ,passwordErrorMessage, ,isPasswordDisabled, clearPasswordInput] = useChangeInputConfig("Password")
+    const [passwordLogin, handlePasswordLoginChange, isPasswordLoginError, ,passwordLoginErrorMessage, ,isPasswordLoginDisabled, clearPasswordLoginInput] = useChangeInputConfig("Password ")
     const [username, handleUsernameChange, isUsernameError, ,usernameErrorMessage, ,isUsernameDisabled, clearUsernameInput] = useChangeInputConfig("Username")
     const [firstName, handleFirstNameChange, isFirstNameError, ,firstNameErrorMessage, ,isFirstNameDisabled, clearFirstNameInput] = useChangeInputConfig("First name")
     const [lastName, handleLastNameChange, isLastNameError, ,lastNameErrorMessage, ,isLastNameDisabled, clearLastNameInput] = useChangeInputConfig("Last name")
@@ -66,7 +67,7 @@ function Auth(props) {
 
     async function handleOnSubmit(e){
         e.preventDefault()
-        const user = isLoginRoute ? {emailUsername, password}:{firstName, lastName, username, email, password}
+        const user = isLoginRoute ? {emailUsername, passwordLogin}:{firstName, lastName, username, email, password}
 
         handleAPICallButtonSubmit({
             method:"post",
@@ -110,6 +111,7 @@ function Auth(props) {
         clearEmailInput()
         clearUsernameInput()
         clearPasswordInput()
+        clearPasswordLoginInput()
         clearConfirmPasswordInput()
         clearFirstNameInput()
         clearLastNameInput()
@@ -119,7 +121,7 @@ function Auth(props) {
     
     if(response ==="Success login"){
         clearEmailUsernameInput()
-        clearPasswordInput()
+        clearPasswordLoginInput()
         setResponse(null)
     }
 
@@ -128,7 +130,7 @@ function Auth(props) {
     }
 
     return (
-        <Grid container spacing spacing={0} justifyContent="center">
+        <Grid container spacing spacing={1} justifyContent="center">
             {successMessageValue && successMessage()}
             {error && errorMessage()}
             <form className={classes.root} onSubmit={handleOnSubmit}>
@@ -203,18 +205,34 @@ function Auth(props) {
                         </Grid>
                     )
                 }
-                <Grid item m={6}>
-                <TextField 
-                fullWidth 
-                label="Password" 
-                name="password" 
-                value={password} 
-                onChange={handlePasswordChange}
-                error = {isPasswordError}
-                helperText={passwordErrorMessage}
-                type="password"
-                />
-                </Grid>
+                {isLoginRoute && (
+                    <Grid item m={6}>
+                    <TextField 
+                    fullWidth 
+                    label="Password" 
+                    name="passwordLogin" 
+                    value={passwordLogin} 
+                    onChange={handlePasswordLoginChange}
+                    error = {isPasswordLoginError}
+                    helperText={passwordLoginErrorMessage}
+                    type="password"
+                    />
+                    </Grid>
+                )}
+                {!isLoginRoute && (
+                    <Grid item m={6}>
+                    <TextField 
+                    fullWidth 
+                    label="Password" 
+                    name="password" 
+                    value={password} 
+                    onChange={handlePasswordChange}
+                    error = {isPasswordError}
+                    helperText={passwordErrorMessage}
+                    type="password"
+                    />
+                    </Grid>
+                )}
                 {
                     !isLoginRoute && (
                         <Grid item m={6}>
@@ -234,7 +252,7 @@ function Auth(props) {
                 }
                 <Grid style={{textAlign:"center"}}>
                     <Button type="submit" variant="contained" color="primary" className="submitButton"
-                    style={{marginTop:10}} disabled={isLoginRoute? isEmailUsernameDisabled || isPasswordDisabled 
+                    style={{marginTop:10}} disabled={isLoginRoute? isEmailUsernameDisabled || isPasswordLoginDisabled 
                     : isEmailDisabled || isPasswordDisabled || isUsernameDisabled||isFirstNameDisabled || isLastNameDisabled}>{buttonTitle}</Button>
                 </Grid>
             </form>
