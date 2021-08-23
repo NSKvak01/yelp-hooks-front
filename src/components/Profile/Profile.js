@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useContext} from 'react'
 import axios from "axios"
 import Cookie from "js-cookie"
 import useChangeInputConfig from '../hooks/profileInput'
@@ -8,6 +8,7 @@ import {Grid,
     TextField, 
     } from "@material-ui/core"
 import MuiAlert from "@material-ui/lab/Alert"
+import { AuthContext } from '../../context/AuthContext'
 
 const useStyles = makeStyles((theme)=>({
     root:{
@@ -18,27 +19,91 @@ const useStyles = makeStyles((theme)=>({
     }
     }))
 
-function Profile() {
+function Profile(props) {
     const classes = useStyles()
+    const {dispatch} = useContext(AuthContext)
 
-    const [email, handleEmailChange, isEmailError, ,emailErrorMessage, ,isEmailDisabled, clearEmailInput] = useChangeInputConfig("Email")
-    const [password, handlePasswordChange, isPasswordError, ,passwordErrorMessage, ,isPasswordDisabled, clearPasswordInput] = useChangeInputConfig("Password")
-    const [username, handleUsernameChange, isUsernameError, ,usernameErrorMessage, ,isUsernameDisabled, clearUsernameInput] = useChangeInputConfig("Username")
-    const [firstName, handleFirstNameChange, isFirstNameError, ,firstNameErrorMessage, ,isFirstNameDisabled, clearFirstNameInput] = useChangeInputConfig("First name")
-    const [lastName, handleLastNameChange, isLastNameError, ,lastNameErrorMessage, ,isLastNameDisabled, clearLastNameInput] = useChangeInputConfig("Last name")
-    
-    async function handleUpdate(){
-        const cookie = Cookie.get("jwt-cookie")
+    const [email, setEmail] = useChangeInputConfig("Email")
+    const [password, setPassword, handlePasswordChange, isPasswordError, passwordErrorMessage] = useChangeInputConfig("Password")
+    const [username, setUsername, handleUsernameChange, isUsernameError, usernameErrorMessage ] = useChangeInputConfig("Username")
+    const [firstName, setFirstName, handleFirstNameChange, isFirstNameError, firstNameErrorMessage ] = useChangeInputConfig("First name")
+    const [lastName, setLastName, handleLastNameChange, isLastNameError, lastNameErrorMessage] = useChangeInputConfig("Last name")
+    const cookie = Cookie.get("jwt-cookie")
+
+    async function logout(){
+        dispatch({
+            type:"LOG_OUT"
+        })
+        Cookie.remove('jwt-cookie')
+        props.history.push('/login')
         try {
-            let result = await axios.put("http://localhost:3000/api/users/pidate-profile", {}, {
-                headers:{
-                    authorization: `Bearer ${cookie}`
-                }
-            })
+            let result = await axios.get('http://localhost:3000/api/users/logout')
         } catch (e) {
             console.log(e)
         }
     }
+    
+    async function handleUserInfo(){
+        try {
+            let fetchUser = await axios.get("http://localhost:3000/api/users/get-user-info",{
+                headers:{
+                    authorization:`Bearer ${cookie}`
+                }
+            })
+            setFirstName(fetchUser.data.payload.firstName)
+            setLastName(fetchUser.data.payload.lastName)
+            setUsername(fetchUser.data.payload.username)
+            setEmail(fetchUser.data.payload.email)
+            setPassword(fetchUser.data.payload.password)
+            console.log(fetchUser.data.payload)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    useEffect(() => {
+       handleUserInfo()
+    }, [])
+
+    async function handleUpdate(event){
+        event.preventDefault()
+        try {
+            let result = await axios.put("http://localhost:3000/api/users/update-user-profile", {
+                firstName:firstName,
+                lastName:lastName,
+                username:username,
+                password:password
+            }, {
+                headers:{
+                    authorization: `Bearer ${cookie}`
+                }
+            })
+
+            if(result.status===202){
+                dispatch({
+                    type:"LOG_OUT"
+                })
+                Cookie.remove('jwt-cookie')
+                props.history.push('/login')
+                try {
+                    let result = await axios.get('http://localhost:3000/api/users/logout')
+                } catch (e) {
+                    console.log(e)
+                }
+                window.sessionStorage.clear("address")
+                window.sessionStorage.clear("term")
+                props.history.push("/login")
+            } else {
+                setFirstName(result.data.payload.firstName)
+                setLastName(result.data.payload.lastName)
+                setUsername(result.data.payload.username)
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+
     return (
             <Grid container spacing spacing={0} justifyContent="center">
                 {/* {successMessageValue && successMessage()}
@@ -88,10 +153,8 @@ function Profile() {
                         label="Email" 
                         name="email" 
                         type="email"
-                        value={email} 
-                        onChange={handleEmailChange}
-                        error = {isEmailError}
-                        helperText={emailErrorMessage}/>
+                        value={email}
+                        disabled="true"/>
                     </Grid>
 
                     

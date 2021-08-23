@@ -48,6 +48,8 @@ function Navbar(props) {
             })
             Cookie.remove('jwt-cookie')
             props.history.push('/login')
+            window.sessionStorage.clear("address")
+            window.sessionStorage.clear("term")
             try {
                 let result = await axios.get('http://localhost:3000/api/users/logout')
                 console.log(result)

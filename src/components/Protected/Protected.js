@@ -12,6 +12,8 @@ function Protected() {
     const [isLoading, setIsLoading] = useState(false)
     const [session, setSession] = useState(false)
     const [disabledSearch, setDisabledSearch] = useState(true)
+    const [sortRating, setSortRating] = useState(false)
+    const [sortPrice, setSortPrice] = useState(false)
     
 
     useEffect(async() => {
@@ -28,6 +30,7 @@ function Protected() {
             setIsLoading(false)
         }
     }, [])
+
 
     useEffect(() => {
         if(term.length!==0 && address.length!==0){

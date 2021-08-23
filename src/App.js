@@ -14,7 +14,7 @@ function App() {
         <AuthContextWrapper>
           <MainRouter />
         </AuthContextWrapper>
-      </Router>
+      </Router> 
     </React.Suspense>
   )
 }
